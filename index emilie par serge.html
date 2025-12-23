@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <meta charset="UTF-8" />
+  <title>Calendrier MAGIQUE pour EMILIE</title>
+  <style>
+    body {
+      background: url("image/traineau.jpg") no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      font-family: PT sans Narrow;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px;
+      color: white;
+      text-shadow: 2px 2px 5px black;
+      position: relative;
+      z-index: 20;
+    }
+
+    #calendrier {
+      display: grid;
+      grid-template-columns: repeat(6, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin: 20px auto;
+      position: relative;
+      z-index: 50;
+      width: min(800px, 95vw);
+    }
+
+    .porte {
+      width: 100px;
+      height: 100px;
+      perspective: 600px;
+      position: relative;
+      z-index: 51;
+    }
+
+    .porte-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s ease;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      will-change: transform;
+    }
+
+    .porte.ouverte .porte-inner {
+      transform: rotateY(180deg);
+    }
+	
+	.porte.ouverte .numero {
+	opacity: 0;
+	transform: scale(0.7);
+	}
+
+    .porte-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .porte-devant {
+      background: crimson;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.7); /* rend les cases visibles */
+    }
+
+    .porte-devant img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: contrast(1.05) saturate(1.05);
+    }
+
+    .numero {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-size: 30px;
+      font-weight: bold;
+      color: gold;
+      text-shadow: 2px 2px 4px black;
+      z-index: 2; /* au-dessus de l'image */
+      pointer-events: none;
+	 transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .porte-arriere {
+      background: white;
+      color: black;
+      transform: rotateY(180deg);
+      font-size: 13px;
+      text-align: center;
+      padding: 8px;
+      line-height: 1.2;
+    }
+
+    .magie {
+        display: inline-block;
+        opacity: 0;
+        animation: apparition 2s ease forwards, scintillement 2s infinite alternate;
+    }
+
+@keyframes apparition {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+    /* Finale */
+    #finale {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      text-align: center;
+      z-index: 200;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    #finale h1 {
+      font-family:'Great Vibes', cursive;
+      margin-top: 20%;
+      margin:0;
+      font-size: 2.5em;
+      color: gold;
+      text-shadow: 2px 2px 5px red;
+      animation: scintillement 1.5s infinite alternate;
+    }
+
+#finale .finale-texte {
+  font-family: 'Great Vibes', cursive; /* police magique */
+  color: gold;
+  text-shadow: 0 0 8px gold, 0 0 15px #ff99ff; /* halo lumineux */
+  margin: 0;
+  line-height: 1.4;
+}
+
+#etoile-fermeture {
+  cursor: pointer;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+
+    @keyframes scintillement {
+      from { opacity: 0.6; text-shadow: 0 0 10px gold; }
+      to { opacity: 1; text-shadow: 0 0 20px red, 0 0 30px gold; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    canvas#fireworks {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 201;
+    }
+
+    canvas#snow-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+@keyframes glow {
+  from { text-shadow: 0 0 5px gold; }
+  to { text-shadow: 0 0 20px red, 0 0 30px gold; }
+}
+
+@keyframes flicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+
+  </style>
+</head>
+<body>
+  <h1>🎄 Calendrier magique EMILIE 🎄</h1>
+  <div id="calendrier"></div>
+
+  <!-- Finale -->
+  <div id="finale">
+  <h1> ✨ Joyeux Noël Emilie ! ✨<br>
+  <h1 class="finale-texte">
+	✨ et bonnes vacances !
+	<span id="etoile-fermeture">✨</span>
+  </h1>
+  </h1>
+    <audio id="musique" src="son/noel.mp3" preload="auto"></audio>
+    <canvas id="fireworks"></canvas>
+  </div>
+
+  <!-- Sons -->
+  <audio id="clochettes" src="son/clochettes.mp3" preload="auto"></audio>
+  
+  <audio id="voix-noel" preload="auto"></audio>
+
+
+  <!-- Neige -->
+  <canvas id="snow-canvas"></canvas>
+
+<script>
+/* ===============================
+   VARIABLES GLOBALES
+================================ */
+let finaleActive = false;
+let fireworksInterval = null;
+let fireworksAnimationId = null;
+
+const calendrier = document.getElementById("calendrier");
+
+const voixDevinettes = {
+  1: "audio/devinette1.mp3",
+  2: "audio/devinette2.mp3",
+  3: "audio/devinette3.mp3",
+  4: "audio/devinette4.mp3",
+  5: "audio/devinette5.mp3",
+  6: "audio/devinette6.mp3",
+  7: "audio/devinette7.mp3",
+  8: "audio/devinette8.mp3",
+  9: "audio/devinette9.mp3",
+  10: "audio/devinette10.mp3",
+  11: "audio/devinette11.mp3",
+  12: "audio/devinette12.mp3",
+  13: "audio/devinette13.mp3",
+  14: "audio/devinette14.mp3"
+};
+
+/* ===============================
+   CONTENUS DES PORTES
+================================ */
+const contenus = [
+  "<span class='magie'>❄️ Devinette 1 : Qu’est-ce qui fond sans jamais pleurer ? (la neige)</span>",
+  "<span class='magie'>🤔 Devinette 2 : Qu’est-ce qui a des clés mais ne peut pas ouvrir de portes ? (un piano)</span>",
+  "<span class='magie'>🎁 Devinette 3 : Qu’est-ce qui monte mais ne redescend jamais ? (l’âge)</span>",
+  "<span class='magie'>🌟 Devinette 4 : Qu’est-ce qui brille sans feu ? (les étoiles)</span>",
+  "<span class='magie'>🎄 Devinette 5 : Qu’est-ce qui est toujours devant toi mais que tu ne peux jamais voir ? (le futur)</span>",
+  "<span class='magie'>🕯️ Devinette 6 : Qu’est-ce qui est plein de trous mais retient l’eau ? (une éponge)</span>",
+  "<span class='magie'>🎅 Devinette 7 : Qu’est-ce qui court mais n’a pas de jambes ? (l’eau)</span>",
+  "<span class='magie'>🍪 Devinette 8 : Qu’est-ce qui est léger comme une plume mais personne ne peut le tenir longtemps ? (le souffle)</span>",
+  "<span class='magie'>😂 Devinette 9 : Qu’est-ce qui a un cou mais pas de tête ? (une bouteille)</span>",
+  "<span class='magie'>✨ Devinette 10 : Qu’est-ce qui a un cœur mais ne bat pas ? (un artichaut)</span>",
+  "<span class='magie'>🎶 Devinette 11 : Qu’est-ce qui est invisible mais te suit partout ? (ton ombre… quand il fait nuit)</span>",
+  "<span class='magie'>💌 Devinette 12 : Qu’est-ce qui est à toi mais que les autres utilisent plus que toi ? (ton prénom)</span>",
+  "<span class='magie'>❄️ Devinette 13 : Qu’est-ce qui peut voyager autour du monde en restant dans un coin ? (un timbre)</span>",
+  "<span class='magie'>🤔 Devinette 14 : Qu’est-ce qui a des dents mais ne mord pas ? (un peigne)</span>",
+
+  "<video  controls width='250'><source src='video/devinettesapin.mp4' type='video/mp4'></video>",
+  "<span class='magie'>🤔 Devinette 16 : Qu’est-ce qui a des dents mais ne mord pas ? (un peigne)</span>",
+  "<video  controls width='250'><source src='video/enigme17.mp4' type='video/mp4'></video>",
+  "<span class='magie'>🎶 Solution : Son frère aura toujours 10 ans de moins donc il aura 60 ans.</span>",
+  "<video  controls width='250'><source src='video/enigme19.mp4' type='video/mp4'></video>",
+  "<span class='magie'>📜 La réponse est 2462 !</span>",
+  "<video  controls width='250'><source src='video/enigme21.mp4' type='video/mp4'></video>",
+  "<span class='magie'>💖 Solution : Il y a minimum 5 sœurs.</span>",
+  "<video  controls width='250'><source src='video/jour23.mp4' type='video/mp4'></video>",
+  "🎆 La grande finale avec musique et feux d’artifice 🎇"
+];
+
+/* ===============================
+   CRÉATION DES PORTES
+================================ */
+for (let jour = 1; jour <= 24; jour++) {
+  const porte = document.createElement("div");
+  porte.className = "porte";
+
+  const inner = document.createElement("div");
+  inner.className = "porte-inner";
+
+  const devant = document.createElement("div");
+  devant.className = "porte-face porte-devant";
+
+  const img = document.createElement("img");
+  img.src = "image/perenoel.jpg";
+  img.alt = "Père Noël";
+
+  const numero = document.createElement("span");
+  numero.className = "numero";
+  numero.textContent = jour;
+
+  devant.appendChild(img);
+  devant.appendChild(numero);
+
+  const arriere = document.createElement("div");
+  arriere.className = "porte-face porte-arriere";
+  arriere.innerHTML = contenus[jour - 1] || "";
+
+  inner.appendChild(devant);
+  inner.appendChild(arriere);
+  porte.appendChild(inner);
+  calendrier.appendChild(porte);
+
+  /* ===== CLIC SUR UNE PORTE ===== */
+  porte.onclick = () => {
+	const etaitFermee = !porte.classList.contains("ouverte");
+	porte.classList.toggle("ouverte");
+	
+	const lecteurVoix = document.getElementById("voix-noel");
+
+	if (etaitFermee && voixDevinettes[jour]) {
+	  const lecteurVoix = document.getElementById("voix-noel");
+	  if (lecteurVoix) {
+		lecteurVoix.src = voixDevinettes[jour];
+		lecteurVoix.currentTime = 0;
+		lecteurVoix.play().catch(() => {});
+	  }
+	}
+	
+	if (!etaitFermee) {
+	  const lecteurVoix = document.getElementById("voix-noel");
+	  if (lecteurVoix) {
+		lecteurVoix.pause();
+		lecteurVoix.currentTime = 0;
+	  }
+	}	
+	
+    // 🎥 Portes avec vidéo
+    if ([15, 17, 19, 21, 23].includes(jour)) {
+      	  setTimeout(() => {
+		const video = porte.querySelector("video");
+        if (video) {
+          video.style.display = "block";
+          video.currentTime = 0;
+          video.play();
+
+          video.onended = () => {
+            video.style.display = "none";
+            porte.classList.remove("ouverte");
+          };
+        }
+      }, 400);
+    }
+
+    // 🎆 Finale
+    if (jour === 24) {
+      lancerFinale();
+    } else {
+      jouerClochettes();
+    }
+  };
+}
+
+/* ===============================
+   SONS
+================================ */
+function jouerClochettes() {
+  const audio = document.getElementById("clochettes");
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+}
+
+/* ===============================
+   FINALE
+================================ */
+function lancerFinale() {
+  if (finaleActive) return;
+  finaleActive = true;
+
+  const overlay = document.getElementById("finale");
+  overlay.style.display = "block";
+
+  const musique = document.getElementById("musique");
+  musique.currentTime = 0;
+  musique.play();
+
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  resizeCanvas(canvas);
+
+  const fireworks = [];
+
+  function Firework(x, y) {
+    this.particles = Array.from({ length: 60 }, () => ({
+      x, y,
+      dx: (Math.random() - 0.5) * 6,
+      dy: (Math.random() - 0.5) * 6,
+      life: 100
+    }));
+  }
+
+  fireworksInterval = setInterval(() => {
+    fireworks.push(new Firework(
+      Math.random() * canvas.width,
+      Math.random() * canvas.height / 2
+    ));
+  }, 900);
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fireworks.forEach(f =>
+      f.particles.forEach(p => {
+        ctx.globalAlpha = p.life / 100;
+        ctx.fillStyle = "gold";
+        ctx.fillRect(p.x, p.y, 2, 2);
+        p.x += p.dx;
+        p.y += p.dy;
+        p.life--;
+      })
+    );
+    ctx.globalAlpha = 1;
+    fireworksAnimationId = requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+/* ===============================
+   FERMETURE DU FINAL
+================================ */
+function fermerFinale() {
+  document.getElementById("finale").style.display = "none";
+  //document.getElementById("voix-noel").pause();
+
+  const musique = document.getElementById("musique");
+  musique.pause();
+  musique.currentTime = 0;
+
+  clearInterval(fireworksInterval);
+  cancelAnimationFrame(fireworksAnimationId);
+
+  fireworksInterval = null;
+  fireworksAnimationId = null;
+  finaleActive = false;
+}
+
+/* ===============================
+   OUTILS
+================================ */
+function resizeCanvas(cnv) {
+  cnv.width = window.innerWidth;
+  cnv.height = window.innerHeight;
+}
+
+/* ===============================
+   ÉTOILE DE FERMETURE
+================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  const etoile = document.getElementById("etoile-fermeture");
+  if (etoile) {
+    etoile.addEventListener("click", e => {
+      e.stopPropagation();
+      fermerFinale();
+    });
+  }
+});
+</script>
+
+</body>
+
+</html>
